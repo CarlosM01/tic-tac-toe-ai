@@ -28,7 +28,7 @@ class GameBoard:
                self.board[condition[2][0]][condition[2][1]] and \
                self.board[condition[0][0]][condition[0][1]] is not None:
                 return self.board[condition[0][0]][condition[0][1]]
-        
+
         if all(cell is not None for row in self.board for cell in row):
             return 'Tie'
         return None

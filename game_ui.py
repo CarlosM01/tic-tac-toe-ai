@@ -7,14 +7,12 @@ from minimax import MinimaxAI
 
 class TicTacToeUI:
     def __init__(self):
-        # Crear ventana principal e instancias de GameBoard y MinimaxAI
         self.window = tk.Tk()
         self.window.title("TIC TAC TOE")
         self.game_board = GameBoard()
         self.ai = MinimaxAI(self.game_board)
-        self.current_player = 'X'  # 'X' es el jugador humano, 'O' es la IA
+        self.current_player = 'X'
 
-        # Crear botones para el tablero
         self.buttons = []
         for row in range(3):
             button_row = []
@@ -25,12 +23,33 @@ class TicTacToeUI:
                 button_row.append(button)
             self.buttons.append(button_row)
 
+        self.create_decision_window()
+
+    def create_decision_window(self):
+        self.decision_window = tk.Toplevel(self.window)
+        self.decision_window.title("Matriz de Decisión")
+        self.decision_window.geometry("300x200")
+        self.decision_labels = [[tk.Label(self.decision_window, text='', font=('Arial', 10), bg='white', width=10)
+                                 for _ in range(3)] for _ in range(3)]
+        for i, row in enumerate(self.decision_labels):
+            for j, label in enumerate(row):
+                label.grid(row=i, column=j, padx=5, pady=5)
+
+    def update_decision_window(self, decision_matrix):
+        for row in self.decision_labels:
+            for label in row:
+                label.config(text='', bg='white')
+
+        for (row, col), score in decision_matrix:
+            self.decision_labels[row][col].config(text=f"{score:.2f}", bg='lightblue')
+
     def reset_game(self):
         self.game_board.reset()
         self.current_player = 'X'
         for row in self.buttons:
             for button in row:
                 button.config(text='', state='normal')
+        self.update_decision_window([])
 
     def make_move(self, row, col):
         if self.current_player == 'X':
@@ -44,9 +63,10 @@ class TicTacToeUI:
                     self.ai_move()
 
     def ai_move(self):
-        best_move = self.ai.best_move()
-        if best_move:
-            row, col = best_move
+        move, decision_matrix = self.ai.best_move()
+        self.update_decision_window(decision_matrix)
+        if move:
+            row, col = move
             self.game_board.make_move(row, col, 'O')
             self.buttons[row][col].config(text='O')
             winner = self.game_board.check_winner()

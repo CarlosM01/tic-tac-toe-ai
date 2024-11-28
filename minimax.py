@@ -20,6 +20,7 @@ class MinimaxAI:
                         eval = self.minimax(board, False)
                         board[row][col] = None
                         max_eval = max(max_eval, eval)
+                        print(max_eval)
             return max_eval
         else:
             min_eval = float('inf')
@@ -30,18 +31,31 @@ class MinimaxAI:
                         eval = self.minimax(board, True)
                         board[row][col] = None
                         min_eval = min(min_eval, eval)
+                        print(min_eval)
             return min_eval
 
     def best_move(self):
         best_val = float('-inf')
         move = None
+        decision_matrix = []
+
         for row in range(3):
             for col in range(3):
                 if self.game_board.board[row][col] is None:
+                    # Simular movimiento
                     self.game_board.board[row][col] = 'O'
                     move_val = self.minimax(self.game_board.board, False)
+
+                    # Ajustar el puntaje si es necesario
+                    adjusted_score = move_val - (0.1 if move_val == 0 else 0)
+                    decision_matrix.append(((row, col), adjusted_score))
+
+                    # Restaurar estado
                     self.game_board.board[row][col] = None
-                    if move_val > best_val:
-                        best_val = move_val
+
+                    # Buscar el mejor movimiento
+                    if adjusted_score > best_val:
+                        best_val = adjusted_score
                         move = (row, col)
-        return move
+
+        return move, decision_matrix
